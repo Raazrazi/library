@@ -1,7 +1,7 @@
 import express from 'express';
-import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import mongoose from 'mongoose';
 import Book from './models/Book.js';
 
 dotenv.config();
@@ -12,15 +12,28 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// Connect to MongoDB
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/libon';
+const MONGODB_URI = process.env.MONGODB_URI;
+let useInMemory = false;
 
+// Dummy data for in-memory fallback
+let memoryBooks = [
+  { id: '1', title: 'Neon Horizons', author: 'J.A. Sterling', coverImage: '/assets/book_cover_scifi.png', rating: 4.8, category: 'Sci-Fi', barcode: '1000000001', status: 'available', borrowedBy: null },
+  { id: '2', title: 'Whispers of the Aether', author: 'Elena Vance', coverImage: '/assets/book_cover_fantasy.png', rating: 4.9, category: 'Fantasy', barcode: '1000000002', status: 'borrowed', borrowedBy: 'Alice Johnson' },
+  { id: '3', title: 'Midnight Shadows', author: 'Marcus Black', coverImage: '/assets/book_cover_thriller.png', rating: 4.6, category: 'Thriller', barcode: '1000000003', status: 'available', borrowedBy: null },
+  { id: '4', title: 'Echoes of Summer', author: 'Lily Rose', coverImage: '/assets/book_cover_romance.png', rating: 4.7, category: 'Romance', barcode: '1000000004', status: 'available', borrowedBy: null }
+];
+
+// Try to connect to MongoDB, if it fails, fallback to in-memory mode
 mongoose.connect(MONGODB_URI)
-  .then(() => console.log('Connected to MongoDB'))
-  .catch(err => console.error('MongoDB connection error:', err));
+  .then(() => console.log('Connected to MongoDB. Using Database Mode.'))
+  .catch(err => {
+    console.error(err);
+    console.warn('\n⚠️ MongoDB connection failed. Falling back to IN-MEMORY mode until you update the URI.\n');
+    useInMemory = true;
+  });
 
-// Routes
 app.get('/api/books', async (req, res) => {
+  if (useInMemory) return res.json(memoryBooks);
   try {
     const books = await Book.find();
     res.json(books);
@@ -30,6 +43,11 @@ app.get('/api/books', async (req, res) => {
 });
 
 app.post('/api/books', async (req, res) => {
+  if (useInMemory) {
+    const newBook = { ...req.body, id: Date.now().toString(), status: 'available', borrowedBy: null };
+    memoryBooks.push(newBook);
+    return res.status(201).json(newBook);
+  }
   try {
     const book = new Book(req.body);
     await book.save();
@@ -40,8 +58,14 @@ app.post('/api/books', async (req, res) => {
 });
 
 app.put('/api/books/:id/borrow', async (req, res) => {
+  const { studentName } = req.body;
+  if (useInMemory) {
+    const bookIndex = memoryBooks.findIndex(b => b.id === req.params.id);
+    if (bookIndex === -1) return res.status(404).json({ message: 'Book not found' });
+    memoryBooks[bookIndex] = { ...memoryBooks[bookIndex], status: 'borrowed', borrowedBy: studentName };
+    return res.json(memoryBooks[bookIndex]);
+  }
   try {
-    const { studentName } = req.body;
     const book = await Book.findByIdAndUpdate(
       req.params.id, 
       { status: 'borrowed', borrowedBy: studentName },
@@ -55,6 +79,12 @@ app.put('/api/books/:id/borrow', async (req, res) => {
 });
 
 app.put('/api/books/:id/return', async (req, res) => {
+  if (useInMemory) {
+    const bookIndex = memoryBooks.findIndex(b => b.id === req.params.id);
+    if (bookIndex === -1) return res.status(404).json({ message: 'Book not found' });
+    memoryBooks[bookIndex] = { ...memoryBooks[bookIndex], status: 'available', borrowedBy: null };
+    return res.json(memoryBooks[bookIndex]);
+  }
   try {
     const book = await Book.findByIdAndUpdate(
       req.params.id, 

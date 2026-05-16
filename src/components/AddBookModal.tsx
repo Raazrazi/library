@@ -8,6 +8,14 @@ interface AddBookModalProps {
   onAdd: (book: { title: string; author: string; category: string; coverImage: string; barcode: string }) => void;
 }
 
+const PRESET_COVERS = [
+  '/assets/book_cover_scifi.png',
+  '/assets/book_cover_fantasy.png',
+  '/assets/book_cover_thriller.png',
+  '/assets/book_cover_romance.png',
+  '/assets/logo_libon_m.png'
+];
+
 const AddBookModal: React.FC<AddBookModalProps> = ({ isOpen, onClose, onAdd }) => {
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
@@ -30,7 +38,7 @@ const AddBookModal: React.FC<AddBookModalProps> = ({ isOpen, onClose, onAdd }) =
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content glass">
+      <div className="modal-content glass" style={{ maxHeight: '90vh', overflowY: 'auto' }}>
         <button className="close-btn" onClick={onClose}><X size={20} /></button>
         <h2>Register New Book</h2>
         <form onSubmit={handleSubmit}>
@@ -50,10 +58,28 @@ const AddBookModal: React.FC<AddBookModalProps> = ({ isOpen, onClose, onAdd }) =
             <label>Barcode</label>
             <input required value={barcode} onChange={e => setBarcode(e.target.value)} placeholder="Scan barcode or type manually" />
           </div>
+          
           <div className="form-group">
-            <label>Cover Image URL (Optional)</label>
-            <input value={coverImage} onChange={e => setCoverImage(e.target.value)} placeholder="https://..." />
+            <label>Select Cover Image (Optional)</label>
+            <div className="preset-covers">
+              {PRESET_COVERS.map(cover => (
+                <img 
+                  key={cover}
+                  src={cover} 
+                  alt="Preset Cover" 
+                  className={`preset-cover ${coverImage === cover ? 'selected' : ''}`}
+                  onClick={() => setCoverImage(cover)}
+                />
+              ))}
+            </div>
+            <input 
+              style={{ marginTop: '0.5rem' }}
+              value={coverImage} 
+              onChange={e => setCoverImage(e.target.value)} 
+              placeholder="Or paste an image URL here..." 
+            />
           </div>
+
           <button type="submit" className="btn btn-primary w-100">Add Book</button>
         </form>
       </div>
