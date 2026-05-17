@@ -5,7 +5,7 @@
   width: 100%;
   z-index: 1000;
   padding: 1.5rem 0;
-  transition: padding var(--transition-normal), background var(--transition-normal);
+  transition: padding var(--transition-normal), background var(--transition-normal), transform var(--transition-normal);
 }
 
 .navbar.scrolled {
@@ -16,10 +16,15 @@
   border-top: none;
 }
 
+.navbar.hidden {
+  transform: translateY(-100%);
+}
+
 .nav-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: relative;
 }
 
 .logo-container {
@@ -43,33 +48,35 @@
 
 .nav-links {
   display: flex;
-  gap: 2rem;
+  gap: 1.5rem;
+  align-items: center;
 }
 
-.nav-links a {
-  font-weight: 500;
+.nav-link-btn {
+  background: transparent;
+  border: none;
   color: var(--color-text-muted);
-  transition: color var(--transition-fast);
-  position: relative;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: all var(--transition-fast);
+  outline: none;
 }
 
-.nav-links a:hover, .nav-links a.active {
-  color: var(--color-text);
+.nav-link-btn:hover {
+  color: var(--color-text) !important;
+  background: rgba(255, 255, 255, 0.04) !important;
 }
 
-.nav-links a::after {
-  content: '';
-  position: absolute;
-  bottom: -4px;
-  left: 0;
-  width: 0;
-  height: 2px;
-  background: var(--color-primary);
-  transition: width var(--transition-fast);
-}
-
-.nav-links a:hover::after, .nav-links a.active::after {
-  width: 100%;
+.nav-link-btn.active {
+  color: #fff !important;
+  background: rgba(59, 130, 246, 0.12) !important;
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.2);
 }
 
 .nav-actions {
@@ -78,54 +85,91 @@
   gap: 1rem;
 }
 
-.search-bar {
-  display: flex;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 20px;
-  padding: 0.5rem 1rem;
-  border: 1px solid var(--glass-border);
-  transition: border-color var(--transition-fast);
+.badge-school {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  color: var(--color-primary);
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
-.search-bar:focus-within {
-  border-color: var(--color-primary);
-}
-
-.search-icon {
-  color: var(--color-text-muted);
-  margin-right: 0.5rem;
-}
-
-.search-bar input {
-  background: transparent;
-  border: none;
-  color: var(--color-text);
-  outline: none;
-  width: 150px;
-  font-family: var(--font-body);
-}
-
-.search-bar input::placeholder {
-  color: var(--color-text-muted);
-}
-
-.icon-btn {
-  background: rgba(255, 255, 255, 0.05);
+.hamburger-btn {
+  display: none;
+  background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--glass-border);
   color: var(--color-text);
   width: 40px;
   height: 40px;
-  border-radius: 50%;
-  display: flex;
+  border-radius: 8px;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all var(--transition-fast);
+  z-index: 1002;
+  outline: none;
 }
 
-.icon-btn:hover {
-  background: var(--color-primary);
-  transform: translateY(-2px);
-  border-color: transparent;
+.hamburger-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--color-primary);
+  transform: scale(1.05);
+}
+
+/* Responsive Overrides */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 1rem 0;
+  }
+  
+  .navbar.scrolled {
+    padding: 0.75rem 0;
+  }
+
+  .hamburger-btn {
+    display: flex;
+  }
+
+  .nav-links {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1.5rem;
+    background: rgba(15, 15, 25, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--glass-border);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: transform var(--transition-normal), opacity var(--transition-normal);
+    pointer-events: none;
+    border-radius: 0 0 16px 16px;
+  }
+
+  .nav-links.open {
+    display: flex;
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .nav-link-btn {
+    width: 100%;
+    justify-content: flex-start;
+    padding: 0.75rem 1.25rem;
+    font-size: 1rem;
+  }
+
+  .nav-actions {
+    display: none; /* Hide School library mode on mobile to make room for logo */
+  }
 }

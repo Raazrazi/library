@@ -9,9 +9,10 @@ interface BookGridProps {
   onBorrowClick: (book: Book) => void;
   onReturnBook: (id: string) => void;
   onScan: (barcode: string) => void;
+  onRemoveBook?: (id: string) => void;
 }
 
-const BookGrid: React.FC<BookGridProps> = ({ books, onAddClick, onBorrowClick, onReturnBook, onScan }) => {
+const BookGrid: React.FC<BookGridProps> = ({ books, onAddClick, onBorrowClick, onReturnBook, onScan, onRemoveBook }) => {
   return (
     <section className="book-grid-section" id="discover">
       <div className="container">
@@ -27,6 +28,7 @@ const BookGrid: React.FC<BookGridProps> = ({ books, onAddClick, onBorrowClick, o
               book={book} 
               onBorrow={() => onBorrowClick(book)}
               onReturn={() => onReturnBook(book.id)}
+              onRemove={onRemoveBook}
             />
           ))}
           {books.length === 0 && (

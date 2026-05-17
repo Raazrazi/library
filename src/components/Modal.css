@@ -113,3 +113,24 @@
   transform: scale(1.1);
   box-shadow: 0 0 10px rgba(138, 43, 226, 0.5);
 }
+
+@media (max-width: 480px) {
+  .modal-content {
+    padding: 1.5rem 1rem;
+    width: 95%;
+  }
+  
+  .modal-content h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .preset-covers {
+    gap: 0.35rem;
+  }
+  
+  .preset-cover {
+    width: 35px;
+    height: 52px;
+  }
+}

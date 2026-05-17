@@ -1,16 +1,18 @@
 import { useState, useEffect } from 'react';
-import type { Book } from '../types';
+import type { Book, HistoryEntry } from '../types';
 
 const API_URL = 'http://localhost:5000/api/books';
+const HISTORY_API_URL = 'http://localhost:5000/api/history';
 
 export const useLibrary = () => {
   const [books, setBooks] = useState<Book[]>([]);
+  const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchBooks = async () => {
     try {
       const response = await fetch(API_URL);
-      if (!response.ok) throw new Error('Failed to fetch');
+      if (!response.ok) throw new Error('Failed to fetch books');
       const data = await response.json();
       setBooks(data);
     } catch (error) {
@@ -20,8 +22,20 @@ export const useLibrary = () => {
     }
   };
 
+  const fetchHistory = async () => {
+    try {
+      const response = await fetch(HISTORY_API_URL);
+      if (!response.ok) throw new Error('Failed to fetch history');
+      const data = await response.json();
+      setHistory(data);
+    } catch (error) {
+      console.error('Error fetching history:', error);
+    }
+  };
+
   useEffect(() => {
     fetchBooks();
+    fetchHistory();
   }, []);
 
   const addBook = async (newBook: Omit<Book, 'id' | 'status' | 'borrowedBy' | 'rating'>) => {
@@ -53,6 +67,7 @@ export const useLibrary = () => {
       if (!response.ok) throw new Error('Failed to borrow');
       const updatedBook = await response.json();
       setBooks(prev => prev.map(book => book.id === id ? updatedBook : book));
+      await fetchHistory(); // immediately sync history
     } catch (error) {
       console.error('Error borrowing book:', error);
     }
@@ -66,8 +81,25 @@ export const useLibrary = () => {
       if (!response.ok) throw new Error('Failed to return');
       const updatedBook = await response.json();
       setBooks(prev => prev.map(book => book.id === id ? updatedBook : book));
+      await fetchHistory(); // immediately sync history
     } catch (error) {
       console.error('Error returning book:', error);
+    }
+  };
+
+  const removeBook = async (id: string) => {
+    try {
+      const response = await fetch(`${API_URL}/${id}`, {
+        method: 'DELETE'
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to delete book');
+      }
+      setBooks(prev => prev.filter(book => book.id !== id));
+    } catch (error: any) {
+      console.error('Error removing book:', error);
+      alert(error.message || 'Error removing book.');
     }
   };
 
@@ -75,5 +107,15 @@ export const useLibrary = () => {
     return books.find(book => book.barcode === barcode);
   };
 
-  return { books, loading, addBook, borrowBook, returnBook, findByBarcode };
+  return { 
+    books, 
+    history, 
+    loading, 
+    addBook, 
+    borrowBook, 
+    returnBook, 
+    removeBook,
+    findByBarcode,
+    fetchHistory
+  };
 };
