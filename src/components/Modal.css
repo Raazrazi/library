@@ -134,3 +134,247 @@
     height: 52px;
   }
 }
+
+/* ── CSV Modal wider ── */
+.csv-modal {
+  max-width: 620px !important;
+}
+
+/* ── Tab switcher ── */
+.modal-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 4px;
+}
+
+.modal-tab {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  border-radius: 7px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modal-tab.active {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(99,102,241,0.4);
+}
+
+.modal-tab:not(.active):hover {
+  color: var(--color-text);
+  background: rgba(255,255,255,0.06);
+}
+
+/* ── CSV hint ── */
+.csv-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  background: rgba(99,102,241,0.08);
+  border: 1px solid rgba(99,102,241,0.2);
+  border-radius: 8px;
+  padding: 0.6rem 0.9rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.csv-hint code {
+  background: rgba(255,255,255,0.08);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 0.78rem;
+  color: #a5b4fc;
+}
+
+/* ── Drop zone ── */
+.csv-dropzone {
+  border: 2px dashed rgba(255,255,255,0.15);
+  border-radius: 12px;
+  padding: 2rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+}
+
+.csv-dropzone:hover,
+.csv-dropzone.dragging {
+  border-color: var(--color-primary);
+  background: rgba(99,102,241,0.07);
+}
+
+.csv-dropzone.has-file {
+  border-style: solid;
+  border-color: rgba(99,102,241,0.4);
+  background: rgba(99,102,241,0.06);
+}
+
+.dropzone-icon {
+  color: var(--color-text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.dropzone-icon.success {
+  color: #34d399;
+}
+
+.dropzone-label {
+  font-weight: 600;
+  color: var(--color-text);
+  font-size: 0.95rem;
+}
+
+.dropzone-filename {
+  font-weight: 600;
+  color: #a5b4fc;
+  font-size: 0.92rem;
+  word-break: break-all;
+}
+
+.dropzone-sub {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
+/* ── Stats bar ── */
+.csv-stats {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.csv-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.25rem 0.65rem;
+  border-radius: 20px;
+}
+
+.csv-stat.valid {
+  background: rgba(52,211,153,0.12);
+  color: #34d399;
+}
+
+.csv-stat.error {
+  background: rgba(248,113,113,0.12);
+  color: #f87171;
+}
+
+.csv-stat.total {
+  background: rgba(255,255,255,0.07);
+  color: var(--color-text-muted);
+}
+
+/* ── Preview table ── */
+.csv-preview-wrap {
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.08);
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.csv-preview-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+}
+
+.csv-preview-table thead {
+  position: sticky;
+  top: 0;
+  background: rgba(17,17,34,0.95);
+  backdrop-filter: blur(6px);
+}
+
+.csv-preview-table th {
+  padding: 0.55rem 0.75rem;
+  text-align: left;
+  color: var(--color-text-muted);
+  font-weight: 600;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  white-space: nowrap;
+}
+
+.csv-preview-table td {
+  padding: 0.45rem 0.75rem;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  color: var(--color-text);
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.csv-preview-table tr.row-error td {
+  background: rgba(248,113,113,0.05);
+}
+
+.csv-preview-table tr.row-valid:hover td {
+  background: rgba(255,255,255,0.02);
+}
+
+/* ── Row badges ── */
+.row-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.15rem 0.5rem;
+  border-radius: 20px;
+  white-space: nowrap;
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.row-badge.ok {
+  background: rgba(52,211,153,0.15);
+  color: #34d399;
+}
+
+.row-badge.err {
+  background: rgba(248,113,113,0.15);
+  color: #f87171;
+  cursor: help;
+}
+
+/* ── Success banner ── */
+.csv-success {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 1rem;
+  padding: 0.85rem 1.2rem;
+  border-radius: 10px;
+  background: rgba(52,211,153,0.12);
+  border: 1px solid rgba(52,211,153,0.25);
+  color: #34d399;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
