@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { PasswordManagement } from './PasswordManagement';
 import './Modal.css';
 
 interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  backendUrl: string;
 }
 
 const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
