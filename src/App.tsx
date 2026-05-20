@@ -33,17 +33,25 @@ function App() {
   }, []);
 
   const handleScan = useCallback((barcode: string) => {
+    const autoViewResults = localStorage.getItem('auto_view_results') !== 'false';
+    const autoCheckinCheckout = localStorage.getItem('auto_checkin_checkout') !== 'false';
+
     const book = findByBarcode(barcode);
     if (!book) {
-      alert(`Book with barcode ${barcode} not found!`);
+      if (autoViewResults) alert(`Book with barcode ${barcode} not found!`);
       return;
     }
 
-    if (book.status === 'available') {
+    if (autoCheckinCheckout) {
+      if (book.status === 'available') {
+        setBorrowingBook(book);
+      } else {
+        returnBook(book.id);
+        if (autoViewResults) alert(`Successfully returned: ${book.title}`);
+      }
+    } else if (autoViewResults) {
+      // Just view it (we can just open the borrow modal as a preview)
       setBorrowingBook(book);
-    } else {
-      returnBook(book.id);
-      alert(`Successfully returned: ${book.title}`);
     }
   }, [findByBarcode, returnBook]);
 
@@ -181,7 +189,6 @@ function App() {
       <SettingsModal 
         isOpen={isSettingsOpen} 
         onClose={() => setIsSettingsOpen(false)} 
-        backendUrl={BASE_URL} 
       />
 
       <div style={{ position: 'fixed', bottom: '20px', right: '20px', display: 'flex', gap: '10px', zIndex: 1000 }}>

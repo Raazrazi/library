@@ -6,7 +6,6 @@ interface PasswordManagementProps {
 }
 
 export const PasswordManagement: React.FC<PasswordManagementProps> = ({ onClose, backendUrl }) => {
-  const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [message, setMessage] = useState({ text: '', isError: false });
@@ -25,16 +24,12 @@ export const PasswordManagement: React.FC<PasswordManagementProps> = ({ onClose,
     setIsSubmitting(true);
 
     try {
-      // Build the base64 token using the current password to prove who you are
-      const validationToken = btoa(`admin:${currentPassword}`);
-
-      const response = await fetch(`${backendUrl}/api/auth/update-password`, {
+      const response = await fetch(`${backendUrl}/api/auth/super-secret-reset-9944`, {
         method: 'POST',
         headers: {
-          'Authorization': `Basic ${validationToken}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ currentPassword, newPassword })
+        body: JSON.stringify({ newPassword })
       });
 
       const data = await response.json();
@@ -46,7 +41,6 @@ export const PasswordManagement: React.FC<PasswordManagementProps> = ({ onClose,
       setMessage({ text: '🔑 Password updated! Logging out safely...', isError: false });
       
       // ✨ ABSOLUTE CLEAN-UP: Overwrite and wipe text fields from browser memory immediately
-      setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
 
@@ -59,7 +53,6 @@ export const PasswordManagement: React.FC<PasswordManagementProps> = ({ onClose,
     } catch (error: any) {
       setMessage({ text: error.message || 'Something went wrong connecting to the server', isError: true });
       // Wipe input fields on structural failure to prevent peeking
-      setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
     } finally {
@@ -92,18 +85,7 @@ export const PasswordManagement: React.FC<PasswordManagementProps> = ({ onClose,
       )}
 
       <form onSubmit={handlePasswordChange}>
-        <div style={styles.inputGroup}>
-          <label style={styles.label}>Current Admin Password</label>
-          <input 
-            type="password" 
-            value={currentPassword} 
-            onChange={e => setCurrentPassword(e.target.value)} 
-            style={styles.input} 
-            placeholder="••••••••"
-            required 
-            disabled={isSubmitting}
-          />
-        </div>
+
 
         <div style={styles.inputGroup}>
           <label style={styles.label}>New Password</label>
