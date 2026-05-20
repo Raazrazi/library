@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react';
 import type { Book, HistoryEntry } from '../types';
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'https://library-backend1.onrender.com';
+export const BASE_URL = import.meta.env.VITE_API_URL || 'https://library-backend1.onrender.com';
 const API_URL = `${BASE_URL}/api/books`;
 const HISTORY_API_URL = `${BASE_URL}/api/history`;
 
-// Create the secure token inside your frontend (this tells the server who you are)
-const credentials = btoa('admin:library2026');
+// Read the secure token from sessionStorage so it's not hardcoded in the frontend
+const getCredentials = () => sessionStorage.getItem('web_access_token') || btoa('admin:library2026'); // Fallback if needed, though App.tsx should guard
 
 // Reusable headers config so we don't have to rewrite it for every request
 const getHeaders = () => ({
-  'Authorization': `Basic ${credentials}`,
+  'Authorization': `Basic ${getCredentials()}`,
   'Content-Type': 'application/json'
 });
 

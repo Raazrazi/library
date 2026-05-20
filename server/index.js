@@ -49,6 +49,19 @@ mongoose.connect(MONGODB_URI)
     useInMemory = true;
   });
 
+// --- API: AUTHENTICATION ---
+app.post('/api/auth/login', (req, res) => {
+  const { username, password } = req.body;
+  const adminUser = process.env.ADMIN_USERNAME || 'libuser';
+  const adminPass = process.env.ADMIN_PASSWORD || 'libpass';
+  
+  if (username === adminUser && password === adminPass) {
+    res.json({ success: true, token: Buffer.from(`${username}:${password}`).toString('base64') });
+  } else {
+    res.status(401).json({ message: 'Invalid credentials' });
+  }
+});
+
 // --- API: BOOKS LIST ---
 app.get('/api/books', async (req, res) => {
   if (useInMemory) return res.json(memoryBooks);

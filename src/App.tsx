@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import BookGrid from './components/BookGrid';
@@ -6,16 +6,10 @@ import Footer from './components/Footer';
 import AddBookModal from './components/AddBookModal';
 import BorrowModal from './components/BorrowModal';
 import HistoryPanel from './components/HistoryPanel';
-import { useLibrary } from './hooks/useLibrary';
+import { useLibrary, BASE_URL } from './hooks/useLibrary';
 import type { Book } from './types';
 
 function App() {
-  const { books, history, addBook, borrowBook, returnBook, removeBook, findByBarcode } = useLibrary();
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [borrowingBook, setBorrowingBook] = useState<Book | null>(null);
-  const [activeView, setActiveView] = useState<'catalog' | 'history'>('catalog');
-
-  // 🔑 Entrance Authentication State
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     return sessionStorage.getItem('web_access_granted') === 'true';
   });
@@ -23,24 +17,12 @@ function App() {
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
 
-  const handleLoginSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (username === 'libuser' && password === 'libpass') {
-      sessionStorage.setItem('web_access_granted', 'true');
-      setIsAuthenticated(true);
-      
-      // Clear inputs immediately on success
-      setUsername('');
-      setPassword('');
-      setLoginError('');
-    } else {
-      setLoginError('Invalid admin username or password.');
-      setPassword('');
-    }
-  };
+  const { books, history, addBook, borrowBook, returnBook, removeBook, findByBarcode } = useLibrary();
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [borrowingBook, setBorrowingBook] = useState<Book | null>(null);
+  const [activeView, setActiveView] = useState<'catalog' | 'history'>('catalog');
 
-  // ✅ FIXED: This function MUST live right here inside the App component
-  const handleScan = (barcode: string) => {
+  const handleScan = useCallback((barcode: string) => {
     const book = findByBarcode(barcode);
     if (!book) {
       alert(`Book with barcode ${barcode} not found!`);
@@ -53,12 +35,63 @@ function App() {
       returnBook(book.id);
       alert(`Successfully returned: ${book.title}`);
     }
+  }, [findByBarcode, returnBook]);
+
+  // Global Barcode Scanner Listener
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    
+    let barcodeBuffer = '';
+    let lastKeyTime = Date.now();
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const currentTime = Date.now();
+      // If time between keystrokes is more than 50ms, clear buffer (probably a human typing)
+      if (currentTime - lastKeyTime > 50) {
+        barcodeBuffer = '';
+      }
+      
+      if (e.key === 'Enter' && barcodeBuffer.length >= 3) {
+        e.preventDefault(); // Prevent default enter behavior (like submitting a form)
+        handleScan(barcodeBuffer);
+        barcodeBuffer = '';
+      } else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        barcodeBuffer += e.key;
+      }
+      lastKeyTime = currentTime;
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleScan, isAuthenticated]);
+
+  const handleLoginSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const response = await fetch(`${BASE_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await response.json();
+      
+      if (response.ok && data.success) {
+        sessionStorage.setItem('web_access_granted', 'true');
+        sessionStorage.setItem('web_access_token', data.token);
+        setIsAuthenticated(true);
+        setUsername('');
+        setPassword('');
+        setLoginError('');
+        window.location.reload(); // Reload to initialize hooks with new token
+      } else {
+        setLoginError(data.message || 'Invalid username or password.');
+        setPassword('');
+      }
+    } catch (err) {
+      setLoginError('Network error logging in.');
+    }
   };
 
-  // ✅ FIXED: This variable MUST live right here inside the App component
-  const uniqueCategories = Array.from(new Set(books.map(b => b.category)));
-
-  // 🛑 ENTRANCE GUARD: Put this AFTER handleScan and uniqueCategories definitions
   if (!isAuthenticated) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#0f172a', fontFamily: 'sans-serif' }}>
@@ -89,7 +122,8 @@ function App() {
     );
   }
 
-  // ✅ ACCESS GRANTED: Renders your dashboard safely
+  const uniqueCategories = Array.from(new Set(books.map(b => b.category)));
+
   return (
     <>
       <Navbar activeView={activeView} onViewChange={setActiveView} />
@@ -132,11 +166,12 @@ function App() {
         }}
       />
 
-      {/* Floating Logout Button */}
       <button 
         onClick={() => {
           sessionStorage.removeItem('web_access_granted');
+          sessionStorage.removeItem('web_access_token');
           setIsAuthenticated(false);
+          window.location.reload();
         }}
         style={{ position: 'fixed', bottom: '20px', right: '20px', padding: '0.6rem 1.2rem', background: '#ef4444', color: 'white', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', zIndex: 1000, boxShadow: '0 4px 6px rgba(0,0,0,0.2)' }}
       >
