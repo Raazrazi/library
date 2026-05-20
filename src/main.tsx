@@ -8,7 +8,7 @@ import './index.css';
 import { BASE_URL } from './hooks/useLibrary';
 
 // 🔑 Change this random path string to whatever secret key phrase you prefer!
-export const SECRET_SECURITY_PATH = "admin-secure-gate-v1-983472190847321";
+export const SECRET_SECURITY_PATH = "api/auth/super-secret-reset-9944";
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
