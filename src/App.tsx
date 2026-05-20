@@ -6,6 +6,7 @@ import Footer from './components/Footer';
 import AddBookModal from './components/AddBookModal';
 import BorrowModal from './components/BorrowModal';
 import HistoryPanel from './components/HistoryPanel';
+import SettingsModal from './components/SettingsModal';
 import { useLibrary, BASE_URL } from './hooks/useLibrary';
 import type { Book } from './types';
 
@@ -19,8 +20,17 @@ function App() {
 
   const { books, history, addBook, borrowBook, returnBook, removeBook, findByBarcode } = useLibrary();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isAutoScanEnabled, setIsAutoScanEnabled] = useState(() => localStorage.getItem('auto_scan_enabled') !== 'false');
   const [borrowingBook, setBorrowingBook] = useState<Book | null>(null);
   const [activeView, setActiveView] = useState<'catalog' | 'history'>('catalog');
+
+  // Listen for setting changes
+  useEffect(() => {
+    const handleToggle = () => setIsAutoScanEnabled(localStorage.getItem('auto_scan_enabled') !== 'false');
+    window.addEventListener('auto_scan_toggled', handleToggle);
+    return () => window.removeEventListener('auto_scan_toggled', handleToggle);
+  }, []);
 
   const handleScan = useCallback((barcode: string) => {
     const book = findByBarcode(barcode);
@@ -39,7 +49,7 @@ function App() {
 
   // Global Barcode Scanner Listener
   useEffect(() => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated || !isAutoScanEnabled) return;
     
     let barcodeBuffer = '';
     let lastKeyTime = Date.now();
@@ -166,17 +176,31 @@ function App() {
         }}
       />
 
-      <button 
-        onClick={() => {
-          sessionStorage.removeItem('web_access_granted');
-          sessionStorage.removeItem('web_access_token');
-          setIsAuthenticated(false);
-          window.location.reload();
-        }}
-        style={{ position: 'fixed', bottom: '20px', right: '20px', padding: '0.6rem 1.2rem', background: '#ef4444', color: 'white', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', zIndex: 1000, boxShadow: '0 4px 6px rgba(0,0,0,0.2)' }}
-      >
-        🔒 Lock Web
-      </button>
+      <SettingsModal 
+        isOpen={isSettingsOpen} 
+        onClose={() => setIsSettingsOpen(false)} 
+        backendUrl={BASE_URL} 
+      />
+
+      <div style={{ position: 'fixed', bottom: '20px', right: '20px', display: 'flex', gap: '10px', zIndex: 1000 }}>
+        <button 
+          onClick={() => setIsSettingsOpen(true)}
+          style={{ padding: '0.6rem 1.2rem', background: '#334155', color: 'white', border: '1px solid #475569', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 6px rgba(0,0,0,0.2)' }}
+        >
+          ⚙️ Settings
+        </button>
+        <button 
+          onClick={() => {
+            sessionStorage.removeItem('web_access_granted');
+            sessionStorage.removeItem('web_access_token');
+            setIsAuthenticated(false);
+            window.location.reload();
+          }}
+          style={{ padding: '0.6rem 1.2rem', background: '#ef4444', color: 'white', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 6px rgba(0,0,0,0.2)' }}
+        >
+          🔒 Lock Web
+        </button>
+      </div>
     </>
   );
 }
