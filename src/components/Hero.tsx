@@ -20,9 +20,6 @@ const Hero: React.FC = () => {
             <button className="btn btn-primary" onClick={() => document.getElementById('discover')?.scrollIntoView({ behavior: 'smooth' })}>
               Manage Books <ArrowRight size={18} />
             </button>
-            <button className="btn btn-secondary glass">
-              View Reports
-            </button>
           </div>
         </div>
         <div className="hero-visual">
