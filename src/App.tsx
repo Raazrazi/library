@@ -15,6 +15,31 @@ function App() {
   const [borrowingBook, setBorrowingBook] = useState<Book | null>(null);
   const [activeView, setActiveView] = useState<'catalog' | 'history'>('catalog');
 
+  // 🔑 Entrance Authentication State
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return sessionStorage.getItem('web_access_granted') === 'true';
+  });
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [loginError, setLoginError] = useState('');
+
+  const handleLoginSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (username === 'libuser' && password === 'libpass') {
+      sessionStorage.setItem('web_access_granted', 'true');
+      setIsAuthenticated(true);
+      
+      // Clear inputs immediately on success
+      setUsername('');
+      setPassword('');
+      setLoginError('');
+    } else {
+      setLoginError('Invalid admin username or password.');
+      setPassword('');
+    }
+  };
+
+  // ✅ FIXED: This function MUST live right here inside the App component
   const handleScan = (barcode: string) => {
     const book = findByBarcode(barcode);
     if (!book) {
@@ -30,8 +55,41 @@ function App() {
     }
   };
 
+  // ✅ FIXED: This variable MUST live right here inside the App component
   const uniqueCategories = Array.from(new Set(books.map(b => b.category)));
 
+  // 🛑 ENTRANCE GUARD: Put this AFTER handleScan and uniqueCategories definitions
+  if (!isAuthenticated) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#0f172a', fontFamily: 'sans-serif' }}>
+        <form onSubmit={handleLoginSubmit} style={{ padding: '2.5rem', background: '#1e293b', borderRadius: '12px', width: '100%', maxWidth: '360px', boxShadow: '0 10px 25px rgba(0,0,0,0.3)' }}>
+          <h2 style={{ color: '#f8fafc', marginBottom: '1.5rem', textAlign: 'center' }}>LibOn-M Entrance</h2>
+          
+          {loginError && (
+            <p style={{ color: '#f87171', backgroundColor: '#7f1d1d', padding: '0.5rem', borderRadius: '4px', fontSize: '14px', textAlign: 'center', marginBottom: '1rem' }}>
+              {loginError}
+            </p>
+          )}
+          
+          <div style={{ marginBottom: '1.25rem' }}>
+            <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1', fontSize: '14px' }}>Admin Username</label>
+            <input type="text" value={username} onChange={e => setUsername(e.target.value)} style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', border: '1px solid #475569', backgroundColor: '#334155', color: '#fff', boxSizing: 'border-box' }} required />
+          </div>
+
+          <div style={{ marginBottom: '1.5rem' }}>
+            <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1', fontSize: '14px' }}>Password</label>
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)} style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', border: '1px solid #475569', backgroundColor: '#334155', color: '#fff', boxSizing: 'border-box' }} required />
+          </div>
+
+          <button type="submit" style={{ width: '100%', padding: '0.75rem', background: '#2563eb', color: 'white', border: 'none', borderRadius: '6px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer' }}>
+            Unlock Web System
+          </button>
+        </form>
+      </div>
+    );
+  }
+
+  // ✅ ACCESS GRANTED: Renders your dashboard safely
   return (
     <>
       <Navbar activeView={activeView} onViewChange={setActiveView} />
@@ -73,6 +131,17 @@ function App() {
           if (borrowingBook) borrowBook(borrowingBook.id, studentName);
         }}
       />
+
+      {/* Floating Logout Button */}
+      <button 
+        onClick={() => {
+          sessionStorage.removeItem('web_access_granted');
+          setIsAuthenticated(false);
+        }}
+        style={{ position: 'fixed', bottom: '20px', right: '20px', padding: '0.6rem 1.2rem', background: '#ef4444', color: 'white', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', zIndex: 1000, boxShadow: '0 4px 6px rgba(0,0,0,0.2)' }}
+      >
+        🔒 Lock Web
+      </button>
     </>
   );
 }
