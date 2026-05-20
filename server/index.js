@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import basicAuth from 'express-basic-auth';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import Book from './models/Book.js';
@@ -12,6 +13,11 @@ const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
+
+app.use(basicAuth({
+    users: { 'libuser': 'libpass' }, // Change your credentials safely here
+    unauthorizedResponse: { message: 'Access Denied: Invalid Credentials' }
+}));
 
 const MONGODB_URI = process.env.MONGODB_URI;
 let useInMemory = false;
@@ -48,19 +54,6 @@ mongoose.connect(MONGODB_URI)
     console.warn('\n⚠️ MongoDB connection failed. Falling back to IN-MEMORY mode.\n');
     useInMemory = true;
   });
-
-// --- API: AUTHENTICATION ---
-app.post('/api/auth/login', (req, res) => {
-  const { username, password } = req.body;
-  const adminUser = process.env.ADMIN_USERNAME || 'libuser';
-  const adminPass = process.env.ADMIN_PASSWORD || 'libpass';
-  
-  if (username === adminUser && password === adminPass) {
-    res.json({ success: true, token: Buffer.from(`${username}:${password}`).toString('base64') });
-  } else {
-    res.status(401).json({ message: 'Invalid credentials' });
-  }
-});
 
 // --- API: BOOKS LIST ---
 app.get('/api/books', async (req, res) => {
@@ -238,6 +231,6 @@ app.get('/api/history', async (req, res) => {
 });
 
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });

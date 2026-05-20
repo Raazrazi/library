@@ -78,27 +78,29 @@ function App() {
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${BASE_URL}/api/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
+      const token = btoa(`${username}:${password}`);
+      const response = await fetch(`${BASE_URL}/api/books`, {
+        method: 'GET',
+        headers: { 
+          'Authorization': `Basic ${token}`,
+          'Content-Type': 'application/json' 
+        }
       });
-      const data = await response.json();
       
-      if (response.ok && data.success) {
+      if (response.ok) {
         sessionStorage.setItem('web_access_granted', 'true');
-        sessionStorage.setItem('web_access_token', data.token);
+        sessionStorage.setItem('web_access_token', token);
         setIsAuthenticated(true);
         setUsername('');
         setPassword('');
         setLoginError('');
         window.location.reload(); // Reload to initialize hooks with new token
       } else {
-        setLoginError(data.message || 'Invalid username or password.');
+        setLoginError('Invalid username or password. Access Denied.');
         setPassword('');
       }
     } catch (err) {
-      setLoginError('Network error logging in.');
+      setLoginError('Network error connecting to the server.');
     }
   };
 
