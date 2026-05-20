@@ -1,9 +1,18 @@
 import { useState, useEffect } from 'react';
 import type { Book, HistoryEntry } from '../types';
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const BASE_URL = import.meta.env.VITE_API_URL || 'https://library-backend1.onrender.com';
 const API_URL = `${BASE_URL}/api/books`;
 const HISTORY_API_URL = `${BASE_URL}/api/history`;
+
+// Create the secure token inside your frontend (this tells the server who you are)
+const credentials = btoa('admin:library2026');
+
+// Reusable headers config so we don't have to rewrite it for every request
+const getHeaders = () => ({
+  'Authorization': `Basic ${credentials}`,
+  'Content-Type': 'application/json'
+});
 
 export const useLibrary = () => {
   const [books, setBooks] = useState<Book[]>([]);
@@ -12,7 +21,10 @@ export const useLibrary = () => {
 
   const fetchBooks = async () => {
     try {
-      const response = await fetch(API_URL);
+      const response = await fetch(API_URL, {
+        method: 'GET',
+        headers: getHeaders()
+      });
       if (!response.ok) throw new Error('Failed to fetch books');
       const data = await response.json();
       setBooks(data);
@@ -25,7 +37,10 @@ export const useLibrary = () => {
 
   const fetchHistory = async () => {
     try {
-      const response = await fetch(HISTORY_API_URL);
+      const response = await fetch(HISTORY_API_URL, {
+        method: 'GET',
+        headers: getHeaders()
+      });
       if (!response.ok) throw new Error('Failed to fetch history');
       const data = await response.json();
       setHistory(data);
@@ -47,7 +62,7 @@ export const useLibrary = () => {
       };
       const response = await fetch(API_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getHeaders(),
         body: JSON.stringify(bookData)
       });
       if (!response.ok) throw new Error('Failed to add book');
@@ -62,7 +77,7 @@ export const useLibrary = () => {
     try {
       const response = await fetch(`${API_URL}/${id}/borrow`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getHeaders(),
         body: JSON.stringify({ studentName })
       });
       if (!response.ok) throw new Error('Failed to borrow');
@@ -77,7 +92,8 @@ export const useLibrary = () => {
   const returnBook = async (id: string) => {
     try {
       const response = await fetch(`${API_URL}/${id}/return`, {
-        method: 'PUT'
+        method: 'PUT',
+        headers: getHeaders() // Passing authentication token for processing validation
       });
       if (!response.ok) throw new Error('Failed to return');
       const updatedBook = await response.json();
@@ -91,7 +107,8 @@ export const useLibrary = () => {
   const removeBook = async (id: string) => {
     try {
       const response = await fetch(`${API_URL}/${id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: getHeaders()
       });
       if (!response.ok) {
         const errorData = await response.json();
