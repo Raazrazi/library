@@ -6,7 +6,7 @@ const API_URL = `${BASE_URL}/api/books`;
 const HISTORY_API_URL = `${BASE_URL}/api/history`;
 
 // Create the secure token inside your frontend (this tells the server who you are)
-const credentials = btoa('admin:library2026');
+const credentials = btoa('libuser:libpass');
 
 // Reusable headers config so we don't have to rewrite it for every request
 const getHeaders = () => ({
