@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import type { Book, HistoryEntry } from '../types';
 
 export const BASE_URL = import.meta.env.VITE_API_URL || 'https://library-backend1.onrender.com';
+
 const API_URL = `${BASE_URL}/api/books`;
 const HISTORY_API_URL = `${BASE_URL}/api/history`;
 

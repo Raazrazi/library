@@ -1,0 +1,329 @@
+/* ── Login Page ─────────────────────────────────────────────────────────── */
+
+.login-bg {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #0f172a;
+  background-image:
+    radial-gradient(ellipse at 20% 30%, rgba(99,102,241,0.18) 0%, transparent 55%),
+    radial-gradient(ellipse at 80% 70%, rgba(56,189,248,0.12) 0%, transparent 55%);
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  padding: 1rem;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 2.5rem 2rem;
+  border-radius: 20px;
+  background: rgba(30, 41, 59, 0.85);
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow:
+    0 25px 60px rgba(0,0,0,0.45),
+    0 0 0 1px rgba(255,255,255,0.04) inset;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  animation: fadeUp 0.4s ease both;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Logo */
+.login-logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.2rem;
+}
+
+.logo-img {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 12px rgba(99,102,241,0.4));
+}
+
+/* Title */
+.login-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #f8fafc;
+  text-align: center;
+  margin: 0 0 0.3rem;
+}
+
+.login-subtitle {
+  font-size: 0.82rem;
+  color: #64748b;
+  text-align: center;
+  margin: 0 0 1.5rem;
+  letter-spacing: 0.02em;
+}
+
+/* Error */
+.login-error {
+  background: rgba(127, 29, 29, 0.6);
+  border: 1px solid rgba(248, 113, 113, 0.3);
+  color: #fca5a5;
+  border-radius: 8px;
+  padding: 0.65rem 0.9rem;
+  font-size: 0.85rem;
+  text-align: center;
+  margin-bottom: 1.2rem;
+  animation: shake 0.3s ease;
+}
+
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  25%      { transform: translateX(-6px); }
+  75%      { transform: translateX(6px); }
+}
+
+/* ── Fingerprint section ── */
+.fingerprint-section {
+  margin-bottom: 0.5rem;
+}
+
+.btn-fingerprint {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1.2rem;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(56,189,248,0.15));
+  border: 1.5px solid rgba(129,140,248,0.4);
+  color: #a5b4fc;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-fingerprint::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(99,102,241,0.3), rgba(56,189,248,0.25));
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.btn-fingerprint:hover::before {
+  opacity: 1;
+}
+
+.btn-fingerprint:hover {
+  border-color: rgba(129,140,248,0.7);
+  color: #c7d2fe;
+  box-shadow: 0 0 24px rgba(99,102,241,0.3);
+  transform: translateY(-1px);
+}
+
+.btn-fingerprint:active {
+  transform: translateY(0);
+}
+
+.btn-fingerprint.loading {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.fp-icon-wrap {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.fp-svg {
+  width: 28px;
+  height: 28px;
+}
+
+/* Register prompt fingerprint (gradient) */
+.fingerprint-icon-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 1.5rem 0;
+}
+
+.fingerprint-icon-wrap .fp-svg {
+  width: 72px;
+  height: 72px;
+  filter: drop-shadow(0 0 16px rgba(129,140,248,0.5));
+}
+
+@keyframes pulse {
+  0%,100% { transform: scale(1);   opacity: 1;   }
+  50%      { transform: scale(1.08); opacity: 0.8; }
+}
+
+.animate-pulse .fp-svg {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Divider */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1.2rem 0 0.5rem;
+}
+
+.divider-line {
+  flex: 1;
+  height: 1px;
+  background: rgba(255,255,255,0.1);
+}
+
+.divider-text {
+  font-size: 0.75rem;
+  color: #475569;
+  white-space: nowrap;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ── Password form ── */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.field-label {
+  font-size: 0.82rem;
+  color: #94a3b8;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.field-input {
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  border: 1.5px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.05);
+  color: #f1f5f9;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.field-input::placeholder {
+  color: #475569;
+}
+
+.field-input:focus {
+  border-color: rgba(99,102,241,0.7);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.18);
+}
+
+/* Submit */
+.btn-submit {
+  margin-top: 0.25rem;
+  width: 100%;
+  padding: 0.85rem;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, #4f46e5, #0ea5e9);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 20px rgba(79,70,229,0.4);
+}
+
+.btn-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(79,70,229,0.5);
+}
+
+.btn-submit:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-submit:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+/* Spinner */
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2.5px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Passkey registration prompt ── */
+.register-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.btn-fingerprint-register {
+  width: 100%;
+  padding: 0.9rem;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, #4f46e5, #0ea5e9);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 20px rgba(79,70,229,0.4);
+}
+
+.btn-fingerprint-register:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(79,70,229,0.5);
+}
+
+.btn-skip {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 12px;
+  border: 1.5px solid rgba(255,255,255,0.1);
+  background: transparent;
+  color: #64748b;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-skip:hover {
+  border-color: rgba(255,255,255,0.2);
+  color: #94a3b8;
+  background: rgba(255,255,255,0.04);
+}

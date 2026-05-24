@@ -7,16 +7,14 @@ import AddBookModal from './components/AddBookModal';
 import BorrowModal from './components/BorrowModal';
 import HistoryPanel from './components/HistoryPanel';
 import SettingsModal from './components/SettingsModal';
-import { useLibrary, BASE_URL } from './hooks/useLibrary';
+import LoginPage from './components/LoginPage';
+import { useLibrary } from './hooks/useLibrary';
 import type { Book } from './types';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     return sessionStorage.getItem('web_access_granted') === 'true';
   });
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [loginError, setLoginError] = useState('');
 
   const { books, history, addBook, borrowBook, returnBook, removeBook, findByBarcode } = useLibrary();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -83,62 +81,16 @@ function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleScan, isAuthenticated]);
 
-  const handleLoginSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const token = btoa(`${username}:${password}`);
-      const response = await fetch(`${BASE_URL}/api/books`, {
-        method: 'GET',
-        headers: { 
-          'Authorization': `Basic ${token}`,
-          'Content-Type': 'application/json' 
-        }
-      });
-      
-      if (response.ok) {
-        sessionStorage.setItem('web_access_granted', 'true');
-        sessionStorage.setItem('web_access_token', token);
-        setIsAuthenticated(true);
-        setUsername('');
-        setPassword('');
-        setLoginError('');
-        window.location.reload(); // Reload to initialize hooks with new token
-      } else {
-        setLoginError('Invalid username or password. Access Denied.');
-        setPassword('');
-      }
-    } catch (err) {
-      setLoginError('Network error connecting to the server.');
-    }
-  };
+
 
   if (!isAuthenticated) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#0f172a', fontFamily: 'sans-serif' }}>
-        <form onSubmit={handleLoginSubmit} style={{ padding: '2.5rem', background: '#1e293b', borderRadius: '12px', width: '100%', maxWidth: '360px', boxShadow: '0 10px 25px rgba(0,0,0,0.3)' }}>
-          <h2 style={{ color: '#f8fafc', marginBottom: '1.5rem', textAlign: 'center' }}>LibOn-M Entrance</h2>
-          
-          {loginError && (
-            <p style={{ color: '#f87171', backgroundColor: '#7f1d1d', padding: '0.5rem', borderRadius: '4px', fontSize: '14px', textAlign: 'center', marginBottom: '1rem' }}>
-              {loginError}
-            </p>
-          )}
-          
-          <div style={{ marginBottom: '1.25rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1', fontSize: '14px' }}>Admin Username</label>
-            <input type="text" value={username} onChange={e => setUsername(e.target.value)} style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', border: '1px solid #475569', backgroundColor: '#334155', color: '#fff', boxSizing: 'border-box' }} required />
-          </div>
-
-          <div style={{ marginBottom: '1.5rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1', fontSize: '14px' }}>Password</label>
-            <input type="password" value={password} onChange={e => setPassword(e.target.value)} style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', border: '1px solid #475569', backgroundColor: '#334155', color: '#fff', boxSizing: 'border-box' }} required />
-          </div>
-
-          <button type="submit" style={{ width: '100%', padding: '0.75rem', background: '#2563eb', color: 'white', border: 'none', borderRadius: '6px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer' }}>
-            Unlock Web System
-          </button>
-        </form>
-      </div>
+      <LoginPage
+        onAuthenticated={() => {
+          setIsAuthenticated(true);
+          window.location.reload();
+        }}
+      />
     );
   }
 
