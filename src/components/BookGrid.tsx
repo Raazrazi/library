@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import BookCard from './BookCard';
 import type { Book } from '../types';
 import ScannerInput from './ScannerInput';
@@ -16,14 +16,7 @@ interface BookGridProps {
 }
 
 const BookGrid: React.FC<BookGridProps> = ({ books, onAddClick, onBorrowClick, onReturnBook, onScan, onRemoveBook }) => {
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-
-  const visibleBooks = books.slice(0, visibleCount);
-  const hasMore = visibleCount < books.length;
-  const isExpanded = visibleCount > PAGE_SIZE;
-
-  const handleViewMore = () => setVisibleCount(prev => prev + PAGE_SIZE);
-  const handleShowLess = () => setVisibleCount(PAGE_SIZE);
+  const visibleBooks = books.slice(0, PAGE_SIZE);
 
   return (
     <section className="book-grid-section" id="discover">
@@ -55,16 +48,9 @@ const BookGrid: React.FC<BookGridProps> = ({ books, onAddClick, onBorrowClick, o
               Showing <strong>{visibleBooks.length}</strong> of <strong>{books.length}</strong> books
             </span>
             <div className="pagination-actions">
-              {hasMore && (
-                <button className="btn btn-view-more" onClick={handleViewMore}>
-                  View More <span className="pagination-arrow">↓</span>
-                </button>
-              )}
-              {isExpanded && (
-                <button className="btn btn-show-less" onClick={handleShowLess}>
-                  Show Less <span className="pagination-arrow">↑</span>
-                </button>
-              )}
+              <Link to="/books" className="btn btn-view-more">
+                View All Books <span className="pagination-arrow">→</span>
+              </Link>
             </div>
           </div>
         )}

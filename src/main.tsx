@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import App from './App.tsx';
 import { PasswordManagement } from './components/PasswordManagement.tsx';
+import AllBooksPage from './pages/AllBooksPage.tsx';
 import './index.css';
 
 import { BASE_URL } from './hooks/useLibrary';
@@ -16,6 +17,9 @@ createRoot(document.getElementById('root')!).render(
       <Routes>
         {/* Standard route to access the general application dashboard */}
         <Route path="/" element={<App />} />
+
+        {/* 📚 Full library inventory page */}
+        <Route path="/books" element={<AllBooksPage />} />
 
         {/* 🕵️‍♂️ Standalone backdoor route for modifying credentials */}
         <Route 
